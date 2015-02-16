@@ -1,0 +1,38 @@
+{
+  "name": "connect-api-mocker-adv",
+  "version": "0.1.0",
+  "description": "Middleware to mock connect request",
+  "main": "index.js",
+  "keywords": [
+    "middleware",
+    "connect",
+    "mock",
+    "proxy",
+    "api",
+    "rest"
+  ],
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/maxaon/connect-api-mocker-adv.git"
+  },
+  "homepage": "https://github.com/maxaon/connect-api-mocker-adv",
+  "dependencies": {
+    "js-yaml": "^3.2.6",
+    "lodash": "^3.2.0",
+    "npm": "^2.5.1"
+  },
+  "devDependencies": {
+    "chai": "^2.0.0",
+    "chai-connect-middleware": "^0.3.1",
+    "coffee-script": "^1.9.0",
+    "mocha": "^2.1.0"
+  },
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script/register test/test*.coffee"
+  },
+  "author": "Peter Kicenko, sahibinden.com",
+  "license": "ISC"
+}

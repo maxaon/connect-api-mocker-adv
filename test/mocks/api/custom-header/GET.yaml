@@ -1,0 +1,6 @@
+status: 403
+disabled: false
+headers:
+  X-Header: header-value
+body:
+  prop: val
