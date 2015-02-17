@@ -11,7 +11,7 @@ gulpConnect.connect.server({
 middleware: function (connect, opt) {
   var mocker = require('connect-api-mocker-adv'),
     options = {
-      url: '/api',
+      urlRoot: '/api',
       pathRoot: 'mocks'
     };
 
@@ -80,7 +80,7 @@ Root location of mock files
 
 Type: `Object`
 
-Default: `{'Content-Type': 'application/json; charset=utf-8'`
+Default: `{'Content-Type': 'application/json; charset=utf-8'}`
 
 Response headers for all requests
 
