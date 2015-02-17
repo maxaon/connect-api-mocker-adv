@@ -1,0 +1,7 @@
+body: |
+  {
+    "key": "value",
+    "subKey": {
+      "subObjectKey":"subObjectValue"
+    }
+  }

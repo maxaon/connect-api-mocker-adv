@@ -86,12 +86,26 @@ describe 'test default behaviour', ->
     .dispatch()
 
   it 'should return text content', (done)->
-    use({forced: true})
+    use()
     .req (req)->
       req.url = '/api/text-content'
     .end (res)->
       res.statusCode.should.be.equal(200)
       res.body.trim().should.be.equal 'This is text\nwith separator'
+      done()
+    .dispatch()
+    
+  it 'should return json in text content', (done)->
+    use()
+    .req (req)->
+      req.url = '/api/text-content'
+      req.method = 'POST'
+    .end (res)->
+      res.statusCode.should.be.equal(200)
+      JSON.parse(res.body).should.be.deep.equal
+        "key": "value"
+        "subKey":
+          "subObjectKey": "subObjectValue"
       done()
     .dispatch()
 
@@ -100,7 +114,6 @@ describe 'test default behaviour', ->
     .req (req)->
       req.url = '/api/not-exist'
     .end (res)->
-      debugger
       res.statusCode.should.be.equal(500)
       should.not.exist(res.body)
 

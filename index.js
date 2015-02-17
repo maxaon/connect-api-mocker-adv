@@ -34,6 +34,7 @@ var _ = require('lodash'),
  * @param {string} [options.mockAll=false] If true and stub was not found do not pass control to next handle
  * @param {string} [options.headers] Default header for all responses default is
  *        'Content-Type: application/json; charset=utf-8'
+ * @param {function(url,request)} urlMangler Change url of request before mock file search
  */
 module.exports = function (options) {
   options = options || {};
@@ -48,7 +49,6 @@ module.exports = function (options) {
   }
   options.headers = options.headers || {'Content-Type': 'application/json; charset=utf-8'};
   return function (req, res, next) {
-    debugger
     if (req.url.indexOf(options.urlRoot) === 0 || req.url === "*") {
       // Ignore querystrings
       var url = req.url.split('?')[0],

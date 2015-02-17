@@ -1,6 +1,6 @@
 {
   "name": "connect-api-mocker-adv",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Middleware to mock connect request",
   "main": "index.js",
   "keywords": [
@@ -21,8 +21,7 @@
   "homepage": "https://github.com/maxaon/connect-api-mocker-adv",
   "dependencies": {
     "js-yaml": "^3.2.6",
-    "lodash": "^3.2.0",
-    "npm": "^2.5.1"
+    "lodash": "^3.2.0"
   },
   "devDependencies": {
     "chai": "^2.0.0",

@@ -55,7 +55,16 @@ body: |
   This is text body line breaks.
   Use > to disable line breaks
 ```
-
+Or with json
+```yaml
+body: |
+  {
+    "key": "value",
+    "subKey": {
+      "subObjectKey":"subObjectValue"
+    }
+  }
+```
 ## API
 
 ### mocker(options)
