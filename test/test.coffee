@@ -1,5 +1,4 @@
 require('./monkey-patcher').patch()
-
 _ = require 'lodash'
 chai = require 'chai'
 chai.use(require('chai-connect-middleware'))
@@ -9,7 +8,10 @@ apiMock = require('..')
 
 describe 'test default behaviour', ->
   use = (options)->
-    mock = apiMock(_.extend {}, {urlRoot: '/api', pathRoot: 'test/mocks'}, options)
+    mock = apiMock(_.extend {}, {
+      urlRoot: '/api',
+      pathRoot: 'test/mocks'
+    }, options)
     chai.connect.use(mock)
 
   it 'should mock response', (done)->
@@ -94,7 +96,7 @@ describe 'test default behaviour', ->
       res.body.trim().should.be.equal 'This is text\nwith separator'
       done()
     .dispatch()
-    
+
   it 'should return json in text content', (done)->
     use()
     .req (req)->

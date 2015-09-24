@@ -1,6 +1,8 @@
 module.exports =
   patch: ->
     Response = require('chai-connect-middleware/lib/response')
+    return if Response.prototype.writeHead
+
     Response.prototype.writeHead = (statusCode, headers)->
       this.statusCode = statusCode
       this._headers = headers

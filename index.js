@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 /**
  * Create handler for mocking REST API.
@@ -22,90 +23,108 @@
 var _ = require('lodash'),
   fs = require('fs'),
   yaml = require('js-yaml'),
-  util = require('util');
+  util = require('util'),
+  traverseHelpers = require('./lib/traverse-helper'),
+  mock = require('./lib/mock'),
+  concatUrl = require('./lib/url-helpers').concatUrl;
 
 
 /**
  * @param {string} options Options
  * @param {string} options.urlRoot Api root that will be watched
  * @param {string} options.pathRoot Folder with mock files
- * @param {string} [options.speedLimit] Simulation speed limit
- * @param {string} [options.forced=false] Force serving of respond, even if it was disabled
- * @param {string} [options.mockAll=false] If true and stub was not found do not pass control to next handle
- * @param {string} [options.headers] Default header for all responses default is
+ * @param {number} [options.speedLimit] Simulation speed limit
+ * @param {boolean} [options.forced=false] Force serving of respond, even if it was disabled
+ * @param {boolean} [options.mockAll=false] If true and stub was not found do not pass control to next handle
+ * @param {boolean} [options.ignoreQuery=true] If true querystring is ignored.
+ * If false - each mock folder will be checked for custom query string.
+ * Format of subfolders with query: #[parameterName[=parameterValue]]
+ * @param {object} [options.headers] Default header for all responses default is
  *        'Content-Type: application/json; charset=utf-8'
- * @param {function(url,request)} urlMangler Change url of request before mock file search
+ * @param {function(url,req)} options.urlMangler Change url of request before mock file search
  */
 module.exports = function (options) {
-  options = options || {};
+  options = _.defaults(options, {
+    speedLimit: 0, // make speed request unlimited,
+    forced: false,
+    mockAll: false,
+    urlMangler: _.identity,
+    ignoreQuery: true,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8'
+    }
+  });
   // Trim url root address from path root address
   options.pathRoot = options.pathRoot.trim();
 
-  options.urlMangler = options.urlMangler || _.identity;
-
-  // If a options.speedLimit not set, set unlimited
-  if (!options.speedLimit) {
-    options.speedLimit = 0; // Unlimited
-  }
-  options.headers = options.headers || {'Content-Type': 'application/json; charset=utf-8'};
   return function (req, res, next) {
-    if (req.url.indexOf(options.urlRoot) === 0 || req.url === "*") {
-      // Ignore querystrings
-      var url = req.url.split('?')[0],
-        method = req.method.toUpperCase(),
-        response = null;
+    if (req.url.indexOf(options.urlRoot) !== 0) {
+      next();
+      return;
+    }
 
-      url = options.urlMangler(url, req);
+    var url = options.urlMangler(req.url, req),
+      query,
+      method = req.method.toUpperCase();
 
-      fs.readFile('./' + options.pathRoot + url + '/' + method + '.yaml', {encoding: 'utf8'}, function (err, buf) {
+    var parts = url.split('?');
+    url = parts[0];
+    query = parts[1];
+
+    if (!query || options.ignoreQuery) {
+      mockRequest(concatUrl(options.pathRoot, url, method));
+      return;
+    }
+
+    traverseHelpers.findQuerySubdirectory(concatUrl(options.pathRoot, url), query, function (err, subdir) {
+      if (err) {
+        handleError(err);
+        return;
+      }
+      if (subdir) {
+        mockRequest(concatUrl(options.pathRoot, url, subdir, method));
+      } else {
+        mockRequest(concatUrl(options.pathRoot, url, method));
+      }
+    });
+
+    function mockRequest(path) {
+      path += '.yaml';
+      debugger;
+      var env = {req: req};
+      mock.readMock(path, options.forced, env, function (err, mock) {
         if (err) {
-          if (err.code === 'ENOENT') {// ?Error NO ENTry
-            if (!options.mockAll)
-              return next();
-            else {
-              util.log(util.format('Cannot find mock %s %s', method, url));
-              res.writeHead(500, options.headers);
-              res.end();
-              return;
-            }
-          }
-          else
-            return next(err);
+          handleError(err);
+          return;
         }
-        var config = yaml.load(buf) || {};
-        if (config.disabled && !options.forced) {
-          if (options.mockAll) {
-            util.log(util.format('Mock file is disabled for method %s and url %s', method, url));
-            res.writeHead(500, options.headers);
-            res.end();
-            return;
-          }
-          else {
-            return next();
-          }
-        }
-
-        if (config.body)
-          response = typeof config.body === "object" ? JSON.stringify(config.body, null, 2) : config.body;
-
-        var resp = {
-          headers: _.extend({}, options.headers, config.headers),
-          body: response
-        };
-        res.writeHead(config.status !== undefined ? config.status : 200, resp.headers);
-
-        util.log(util.format('Mocked %s %s', method, url));
+        res.writeHead(mock.status, _.defaults(mock.headers, options.headers));
+        util.log(util.format('Mocked %s %s%s', method, url, options.ignoreQuery && query ? '' : '?' + query));
 
         if (options.speedLimit) {
           setTimeout(function () {
-            res.end(resp.body);
-          }, buf.length / (options.speedLimit * 1024 / 8 ) * 1000);
+            res.end(mock.body);
+          }, mock.body.length / (options.speedLimit * 1024 / 8 ) * 1000);
         } else {
-          res.end(resp.body);
+          res.end(mock.body);
         }
       });
-    } else {
-      next();
+    }
+
+    function handleError(err) {
+      if (err.code === 'ENOENT' || err.code === 'MockDisabled') {// ?Error NO ENTry
+        if (!options.mockAll) {
+          return next();
+        }
+        var message = err.code === 'MockDisabled'
+          ? util.format('Mock file is disabled for method %s and url %s', method, url)
+          : util.format('Cannot find mock %s %s', method, url);
+        util.log(message);
+        res.writeHead(500, options.headers);
+        res.end();
+      }
+      else {
+        next(err);
+      }
     }
   };
 };
