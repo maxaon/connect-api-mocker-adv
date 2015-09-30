@@ -90,7 +90,7 @@ module.exports = function (options) {
 
     function mockRequest(path) {
       path += '.yaml';
-      debugger;
+
       var env = {req: req};
       mock.readMock(path, options.forced, env, function (err, mock) {
         if (err) {

@@ -104,4 +104,16 @@ describe 'test with different queries', ->
       done()
     .dispatch()
 
+  it 'should mock with correct message', (done) ->
+    use()
+    .req (req)->
+      req.url = "/api/with-query?groupBy=track&subGroupBy=deliveryTypeGroup"
+    .end (res)->
+      assertResponse(res)
+      .should.have.property('groupBy', 'track')
+
+      done()
+    .dispatch()
+
+
 
