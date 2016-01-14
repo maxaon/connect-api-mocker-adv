@@ -21,13 +21,18 @@ middleware: function (connect, opt) {
 ```
 
 Firstly mocks will be served, than other middleware.
-
+          
 ## Structure
 
 Mock file will be searched from `pathRoot` according to request url and request method. 
 For example if `pathRoot` is 'mocks', `method` is 'GET' and `url` is '/api/collection mock files will be searched under 
 './mocks/api/collection/GET.yaml'. Filename int the upper case.
 
+
+## Disable subtree
+
+Adding file `disabled` without content or with `true` will disable all subtree from current path 
+ 
 ### Mock file structure
 
 Mock file is a yaml config file with next keys:
