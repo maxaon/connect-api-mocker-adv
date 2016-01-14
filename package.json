@@ -1,6 +1,6 @@
 {
   "name": "connect-api-mocker-adv",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Middleware to mock connect request",
   "main": "index.js",
   "keywords": [
