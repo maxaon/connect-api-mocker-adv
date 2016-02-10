@@ -20,6 +20,25 @@ middleware: function (connect, opt) {
 });
 ```
 
+If don't want use gulp, you can use without 
+```javascript
+var connect = require('connect');
+var http = require('http');
+var mocker = require('connect-api-mocker-adv')
+ 
+var app = connect();
+
+ var   options = {
+      urlRoot: '/api',
+      pathRoot: 'mocks',
+      ignoreQuery: false
+    };
+    
+app.use(mocker(options));
+
+http.createServer(app).listen(3000);
+```
+
 Firstly mocks will be served, than other middleware.
           
 ## Structure
@@ -129,6 +148,16 @@ Type: `Number`
 Default: 0 (unlimited) 
 
 Limit speed of response in KB
+
+### options.ignoreQuery
+
+Type: `Number`
+
+Default: true 
+
+If true querystring is ignored.
+ - If false - each mock folder will be checked for custom query string.
+ - Format of subfolders with query: #[parameterName[=parameterValue]]
 
 
 
