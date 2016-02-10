@@ -151,7 +151,7 @@ Limit speed of response in KB
 
 ### options.ignoreQuery
 
-Type: `Number`
+Type: `Boolean`
 
 Default: true 
 
