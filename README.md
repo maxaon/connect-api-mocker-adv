@@ -1,4 +1,4 @@
-## Advanced API mocker
+## Advanced API mocker Version 2
 
 This is a connect.js middleware to mock http request with manual body, headers and status code. Used to mock REST API.
 
