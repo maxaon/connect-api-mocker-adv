@@ -1,4 +1,4 @@
-## Advanced API mocker
+## Advanced API mocker Version 2
 
 This is a connect.js middleware to mock http request with manual body, headers and status code. Used to mock REST API.
 
@@ -18,6 +18,25 @@ middleware: function (connect, opt) {
   return [mocker(options)];
 }
 });
+```
+
+If don't want use gulp, you can use without 
+```javascript
+var connect = require('connect');
+var http = require('http');
+var mocker = require('connect-api-mocker-adv')
+ 
+var app = connect();
+
+ var   options = {
+      urlRoot: '/api',
+      pathRoot: 'mocks',
+      ignoreQuery: false
+    };
+    
+app.use(mocker(options));
+
+http.createServer(app).listen(3000);
 ```
 
 Firstly mocks will be served, than other middleware.
@@ -129,6 +148,16 @@ Type: `Number`
 Default: 0 (unlimited) 
 
 Limit speed of response in KB
+
+### options.ignoreQuery
+
+Type: `Boolean`
+
+Default: true 
+
+If true querystring is ignored.
+ - If false - each mock folder will be checked for custom query string.
+ - Format of subfolders with query: #[parameterName[=parameterValue]]
 
 
 
